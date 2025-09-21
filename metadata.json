@@ -1,0 +1,5 @@
+{
+  "name": "Luna AI",
+  "description": "A conversational AI assistant powered by Google Gemini, designed to provide helpful and creative responses in a sleek, modern interface.",
+  "requestFramePermissions": []
+}
