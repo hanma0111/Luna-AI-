@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { GoogleGenAI, Chat, Content, Part, Modality } from "@google/genai";
-import { Message, Role, GroundingChunk, ChatHistory, ChatSession } from '../types';
+import { Message, Role, GroundingChunk, ChatHistory, ChatSession, Persona } from '../types';
 
 // --- Single AI Instance & Initialization ---
 // Initialize the AI client once and reuse it across the application.
@@ -36,7 +36,7 @@ const createNewChatSession = (): ChatSession => {
   };
 };
 
-export const useChat = (currentUser: string | null, lunaVersion: '1.0' | '2.0') => {
+export const useChat = (currentUser: string | null, lunaVersion: '1.0' | '2.0', activePersona: Persona | undefined) => {
   const [chatHistory, setChatHistory] = useState<ChatHistory>({ activeChatId: null, sessions: {} });
   const [isLoading, setIsLoading] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
@@ -100,9 +100,13 @@ export const useChat = (currentUser: string | null, lunaVersion: '1.0' | '2.0') 
           parts: [{ text: msg.text }],
         }));
 
-      const systemInstruction = lunaVersion === '2.0'
+      let systemInstruction = lunaVersion === '2.0'
         ? "You are Luna 2.0, an advanced AI assistant and expert programmer. Your responses should be highly detailed, structured, and nuanced. For any request, break down the solution into clear, logical steps. Use Markdown for formatting, including tables, lists, and multiple code blocks with language identifiers where appropriate, to enhance clarity. When providing code, also provide a thorough explanation of how it works. You are proactive in your assistance, anticipating user needs and offering further suggestions or optimizations."
         : "You are Luna, a friendly and helpful AI assistant.";
+      
+      if (activePersona) {
+        systemInstruction = activePersona.prompt;
+      }
 
       chatRef.current = ai.chats.create({
         model: 'gemini-2.5-flash',
@@ -112,7 +116,7 @@ export const useChat = (currentUser: string | null, lunaVersion: '1.0' | '2.0') 
     } catch (error) {
       console.error("Failed to initialize chat:", error);
     }
-  }, [lunaVersion]);
+  }, [lunaVersion, activePersona]);
 
   useEffect(() => {
     if (activeChat) {
@@ -431,7 +435,7 @@ export const useChat = (currentUser: string | null, lunaVersion: '1.0' | '2.0') 
 
   const debugError = useCallback(async (error: Error, errorInfo: React.ErrorInfo) => {
     // Force switch to Luna 2.0 for this expert task
-    if (lunaVersion !== '2.0') {
+    if (lunaVersion !== '2.0' && !activePersona) {
       console.warn("Switching to Luna 2.0 for error debugging.");
     }
     const newSession = createNewChatSession();
@@ -468,7 +472,7 @@ Based on this information, please provide:
       `;
       sendMessage(debugPrompt);
     }, 0);
-  }, [lunaVersion]);
+  }, [lunaVersion, activePersona]);
 
 
   return {

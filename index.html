@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -22,6 +21,13 @@
         background: #6b7280; /* bg-gray-500 */
       }
     </style>
+  <script>
+    // Define process.env.API_KEY for the browser environment as requested.
+    if (typeof window.process === 'undefined') {
+      window.process = { env: {} };
+    }
+    window.process.env.API_KEY = "AIzaSyCKRow6G_5UWtp-uzWuXZXI8Idg2JEODX0";
+  </script>
   <script type="importmap">
 {
   "imports": {

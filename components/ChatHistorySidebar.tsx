@@ -54,7 +54,7 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
   return (
     <>
       {isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" onClick={onClose}></div>}
-      <aside className={`absolute md:relative z-30 flex flex-col h-full w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+      <aside className={`fixed inset-y-0 left-0 z-30 flex flex-col h-full w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 flex justify-between items-center border-b border-gray-700">
           <h2 className="text-lg font-semibold">Chat History</h2>
           <button onClick={onClose} className="md:hidden p-1"><CloseIcon className="w-5 h-5" /></button>

@@ -29,3 +29,9 @@ export interface ChatHistory {
   activeChatId: string | null;
   sessions: Record<string, ChatSession>;
 }
+
+export interface Persona {
+  id: string;
+  name: string;
+  prompt: string;
+}

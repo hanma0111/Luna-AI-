@@ -9,6 +9,7 @@ import { EditIcon } from './icons/EditIcon';
 import { VideoIcon } from './icons/VideoIcon';
 import ImageGenerationModal from './ImageGenerationModal';
 import VideoGenerationModal from './VideoGenerationModal';
+import { StopIcon } from './icons/StopIcon';
 
 interface ImageAttachment {
   mimeType: string;
@@ -134,46 +135,53 @@ const ChatInput: React.FC<ChatInputProps> = ({
           You've reached your free message limit. Please log in for unlimited access.
         </div>
       )}
-      {isLoading ? (
-        <button onClick={onStopGeneration} className="mb-3 px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-700 transition-colors">
-          Stop generating
-        </button>
-      ) : (
-        <form onSubmit={handleSubmit} className="w-full relative">
-          <div className="flex flex-col border border-gray-700 rounded-2xl bg-gray-800 focus-within:border-gray-500 transition-colors">
-              <textarea
-                  ref={textareaRef} value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={placeholderText}
-                  className="w-full bg-transparent focus:outline-none resize-none px-4 pt-4 pb-12 placeholder-gray-500 disabled:opacity-50 overflow-y-auto"
-                  disabled={isLocked} rows={1}
-              />
-              {attachment && (
-                <div className="px-4 pb-3 text-xs text-gray-400 flex items-center gap-2 animate-fade-in">
-                  <span>Attached: {attachment.name}</span>
-                  <button type="button" onClick={() => setAttachment(null)} className="font-bold text-red-500 hover:text-red-400" aria-label="Remove attachment" disabled={isLocked}>
-                    &times;
-                  </button>
-                </div>
-              )}
+      
+      <form onSubmit={handleSubmit} className="w-full relative">
+        <div className="flex flex-col border border-gray-700 rounded-2xl bg-gray-800 focus-within:border-gray-500 transition-colors">
+            <textarea
+                ref={textareaRef} value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={isLoading ? "Luna is thinking..." : placeholderText}
+                className="w-full bg-transparent focus:outline-none resize-none px-4 pt-4 pb-12 placeholder-gray-500 disabled:opacity-50 overflow-y-auto"
+                disabled={isLocked || isLoading} rows={1}
+            />
+            {attachment && !isLoading && (
+              <div className="px-4 pb-3 text-xs text-gray-400 flex items-center gap-2 animate-fade-in">
+                <span>Attached: {attachment.name}</span>
+                <button type="button" onClick={() => setAttachment(null)} className="font-bold text-red-500 hover:text-red-400" aria-label="Remove attachment" disabled={isLocked}>
+                  &times;
+                </button>
+              </div>
+            )}
+            {!isLoading && (
               <button type="submit" disabled={isLocked || (!input.trim() && !attachment)}
                   className="absolute right-3 bottom-3 p-2 bg-gray-600 rounded-full text-white hover:bg-gray-500 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   aria-label="Send message">
                   <UpArrowIcon className="w-5 h-5" />
               </button>
-          </div>
-        </form>
+            )}
+        </div>
+      </form>
+      
+      {isLoading ? (
+        <div className="flex items-center justify-center flex-wrap gap-2 mt-3">
+            <button onClick={onStopGeneration} className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                <StopIcon className="w-4 h-4" />
+                Stop generating
+            </button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center flex-wrap gap-2 mt-3">
+            <ActionButton icon={<AttachIcon className="w-4 h-4" />} label="Attach" onClick={handleAttachClick} />
+            <ActionButton icon={<EditIcon className="w-4 h-4" />} label="Edit" onClick={handleEditClick} disabled={!attachment}/>
+            <ActionButton icon={<ImageIcon className="w-4 h-4" />} label="Imagine" onClick={() => setIsImageModalOpen(true)} />
+            <ActionButton icon={<VideoIcon className="w-4 h-4" />} label="Video" onClick={() => setIsVideoModalOpen(true)} />
+            <ActionButton icon={<SearchIcon className="w-4 h-4" />} label="Search" onClick={handleSearchClick} />
+            <ActionButton icon={<StudyIcon className="w-4 h-4" />} label="Study" onClick={handleStudyClick} />
+            <ActionButton icon={<CodeIcon className="w-4 h-4" />} label="Coding" onClick={handleCodeClick} />
+        </div>
       )}
-      <div className="flex items-center justify-center flex-wrap gap-2 mt-3">
-          <ActionButton icon={<AttachIcon className="w-4 h-4" />} label="Attach" onClick={handleAttachClick} />
-          <ActionButton icon={<EditIcon className="w-4 h-4" />} label="Edit" onClick={handleEditClick} disabled={!attachment}/>
-          <ActionButton icon={<ImageIcon className="w-4 h-4" />} label="Imagine" onClick={() => setIsImageModalOpen(true)} />
-          <ActionButton icon={<VideoIcon className="w-4 h-4" />} label="Video" onClick={() => setIsVideoModalOpen(true)} />
-          <ActionButton icon={<SearchIcon className="w-4 h-4" />} label="Search" onClick={handleSearchClick} />
-          <ActionButton icon={<StudyIcon className="w-4 h-4" />} label="Study" onClick={handleStudyClick} />
-          <ActionButton icon={<CodeIcon className="w-4 h-4" />} label="Coding" onClick={handleCodeClick} />
-      </div>
 
       <ImageGenerationModal isOpen={isImageModalOpen} onClose={() => setIsImageModalOpen(false)} onGenerate={handleGenerateImage} isLoading={isLoading} />
       <VideoGenerationModal isOpen={isVideoModalOpen} onClose={() => setIsVideoModalOpen(false)} onGenerate={handleGenerateVideo} isLoading={isLoading} />
